@@ -1,5 +1,5 @@
 #include "binary_trees.h"
-#include <stdlib.h"
+#include <stdlib.h>
 
 /**
  * max - returns the maximum of two integers
@@ -27,3 +27,4 @@ size_t binary_tree_height(const binary_tree_t *tree)
 
 	return (1 + max(binary_tree_height(tree->left), binary_tree_height(tree->right)));
 }
+
