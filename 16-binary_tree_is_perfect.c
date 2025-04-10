@@ -23,7 +23,7 @@ if (!tree)
 return (0);
 
 if (!tree->left && !tree->right)
-return (0);
+return (1);
 
 return (1 + max(
 binary_tree_height(tree->left),
