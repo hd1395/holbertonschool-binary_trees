@@ -13,41 +13,6 @@ size_t binary_tree_size(const binary_tree_t *tree)
 }
 
 /**
- * get_node_at_index - Gets the parent node for the next insertion
- * using index in level-order fashion
- * @tree: Pointer to the root node
- * @index: Index of the parent node
- * Return: Pointer to the parent node
- */
-heap_t *get_node_at_index(heap_t *tree, size_t index)
-{
-	size_t path[64];
-	size_t depth = 0, i;
-	heap_t *current = tree;
-
-	if (!tree)
-		return (NULL);
-
-	while (index)
-	{
-		path[depth++] = index % 2;
-		index /= 2;
-	}
-
-	for (i = depth; i > 1; i--)
-	{
-		if (path[i - 1] == 0)
-			current = current->left;
-		else
-			current = current->right;
-
-		if (!current)
-			return (NULL);
-	}
-	return (current);
-}
-
-/**
  * bubble_up - Moves the inserted node up to maintain Max Heap
  * @node: Pointer to the inserted node
  * Return: Pointer to the final node after bubbling
@@ -74,8 +39,9 @@ heap_t *bubble_up(heap_t *node)
  */
 heap_t *heap_insert(heap_t **root, int value)
 {
-	size_t size;
-	heap_t *parent;
+	heap_t *new_node, *current;
+	heap_t **queue, *temp;
+	size_t front = 0, rear = 0, size = 1024;
 
 	if (!root)
 		return (NULL);
@@ -86,24 +52,37 @@ heap_t *heap_insert(heap_t **root, int value)
 		return (*root);
 	}
 
-	size = binary_tree_size(*root);
-	parent = get_node_at_index(*root, (size - 1) / 2);
-
-	if (!parent)
+	queue = malloc(sizeof(heap_t *) * size);
+	if (!queue)
 		return (NULL);
 
-	if (!parent->left)
+	queue[rear++] = *root;
+
+	while (front < rear)
 	{
-		parent->left = binary_tree_node(parent, value);
-		if (!parent->left)
-			return (NULL);
-		return (bubble_up(parent->left));
+		current = queue[front++];
+
+		if (!current->left)
+		{
+			current->left = binary_tree_node(current, value);
+			new_node = current->left;
+			free(queue);
+			return (bubble_up(new_node));
+		}
+		else
+			queue[rear++] = current->left;
+
+		if (!current->right)
+		{
+			current->right = binary_tree_node(current, value);
+			new_node = current->right;
+			free(queue);
+			return (bubble_up(new_node));
+		}
+		else
+			queue[rear++] = current->right;
 	}
-	else
-	{
-		parent->right = binary_tree_node(parent, value);
-		if (!parent->right)
-			return (NULL);
-		return (bubble_up(parent->right));
-	}
+
+	free(queue);
+	return (NULL);
 }
