@@ -40,7 +40,7 @@ heap_t *bubble_up(heap_t *node)
 heap_t *heap_insert(heap_t **root, int value)
 {
 	heap_t *new_node, *current;
-	heap_t **queue, *temp;
+	heap_t **queue;
 	size_t front = 0, rear = 0, size = 1024;
 
 	if (!root)
@@ -65,22 +65,38 @@ heap_t *heap_insert(heap_t **root, int value)
 		if (!current->left)
 		{
 			current->left = binary_tree_node(current, value);
+			if (!current->left)
+			{
+				free(queue);
+				return (NULL);
+			}
 			new_node = current->left;
 			free(queue);
 			return (bubble_up(new_node));
 		}
 		else
-			queue[rear++] = current->left;
+		{
+			if (rear < size)
+				queue[rear++] = current->left;
+		}
 
 		if (!current->right)
 		{
 			current->right = binary_tree_node(current, value);
+			if (!current->right)
+			{
+				free(queue);
+				return (NULL);
+			}
 			new_node = current->right;
 			free(queue);
 			return (bubble_up(new_node));
 		}
 		else
-			queue[rear++] = current->right;
+		{
+			if (rear < size)
+				queue[rear++] = current->right;
+		}
 	}
 
 	free(queue);
