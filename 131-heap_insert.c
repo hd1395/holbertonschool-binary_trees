@@ -32,10 +32,35 @@ heap_t *bubble_up(heap_t *node)
 }
 
 /**
- * heap_insert_levelorder - Helper for heap_insert using level-order traversal
- * @root: Pointer to the root node
+ * heap_insert_into_node - Attempts to insert value into a node
+ * @current: Node to insert into
  * @value: Value to insert
- * Return: Pointer to the created node or NULL on failure
+ * Return: Pointer to new node or NULL
+ */
+heap_t *heap_insert_into_node(heap_t *current, int value)
+{
+	if (!current->left)
+	{
+		current->left = binary_tree_node(current, value);
+		if (!current->left)
+			return (NULL);
+		return (current->left);
+	}
+	if (!current->right)
+	{
+		current->right = binary_tree_node(current, value);
+		if (!current->right)
+			return (NULL);
+		return (current->right);
+	}
+	return (NULL);
+}
+
+/**
+ * heap_insert_levelorder - Inserts a node using level-order traversal
+ * @root: Pointer to the root of the heap
+ * @value: Value to insert
+ * Return: Pointer to the created node or NULL
  */
 heap_t *heap_insert_levelorder(heap_t *root, int value)
 {
@@ -53,28 +78,16 @@ heap_t *heap_insert_levelorder(heap_t *root, int value)
 	{
 		current = queue[front++];
 
-		if (!current->left)
+		new_node = heap_insert_into_node(current, value);
+		if (new_node)
 		{
-			current->left = binary_tree_node(current, value);
-			if (!current->left)
-				break;
-			new_node = current->left;
 			free(queue);
 			return (bubble_up(new_node));
 		}
-		else if (rear < size)
-			queue[rear++] = current->left;
 
-		if (!current->right)
-		{
-			current->right = binary_tree_node(current, value);
-			if (!current->right)
-				break;
-			new_node = current->right;
-			free(queue);
-			return (bubble_up(new_node));
-		}
-		else if (rear < size)
+		if (rear < size)
+			queue[rear++] = current->left;
+		if (rear < size)
 			queue[rear++] = current->right;
 	}
 
