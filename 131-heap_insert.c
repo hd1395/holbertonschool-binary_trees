@@ -13,31 +13,35 @@ size_t binary_tree_size(const binary_tree_t *tree)
 }
 
 /**
- * get_node_at_index - Gets the node at a given index (level-order traversal)
+ * get_node_at_index - Gets the node at a given index using binary path
  * @tree: Pointer to the root node
- * @index: Index to search for
- * Return: Pointer to the node or NULL
+ * @index: Index in level-order traversal
+ * Return: Pointer to the parent node at given index
  */
 heap_t *get_node_at_index(heap_t *tree, size_t index)
 {
-	size_t path[64], i = 0, depth = 0;
 	heap_t *current = tree;
+	size_t path[64];
+	size_t depth = 0, i;
 
 	if (!tree)
 		return (NULL);
 
+	/* Build the path from root to index */
 	while (index)
 	{
 		path[depth++] = index % 2;
 		index /= 2;
 	}
 
+	/* Traverse the path except the last step (return parent node) */
 	for (i = depth; i > 1; i--)
 	{
 		if (path[i - 1] == 0)
 			current = current->left;
 		else
 			current = current->right;
+
 		if (!current)
 			return (NULL);
 	}
@@ -66,7 +70,7 @@ void bubble_up(heap_t *node)
  * heap_insert - Inserts a value in Max Binary Heap
  * @root: Double pointer to the root node
  * @value: Value to insert
- * Return: Pointer to the created node or NULL
+ * Return: Pointer to the created node or NULL on failure
  */
 heap_t *heap_insert(heap_t **root, int value)
 {
