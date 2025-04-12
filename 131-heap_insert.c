@@ -28,20 +28,19 @@ heap_t *get_node_at_index(heap_t *tree, size_t index)
 	if (!tree)
 		return (NULL);
 
-	/* Convert index to binary path */
 	while (index)
 	{
 		path[depth++] = index % 2;
 		index /= 2;
 	}
 
-	/* Traverse using path (skip last bit to get parent) */
 	for (i = depth; i > 1; i--)
 	{
 		if (path[i - 1] == 0)
 			current = current->left;
 		else
 			current = current->right;
+
 		if (!current)
 			return (NULL);
 	}
@@ -51,8 +50,9 @@ heap_t *get_node_at_index(heap_t *tree, size_t index)
 /**
  * bubble_up - Moves the inserted node up to maintain Max Heap
  * @node: Pointer to the inserted node
+ * Return: Pointer to the final node after bubbling
  */
-void bubble_up(heap_t *node)
+heap_t *bubble_up(heap_t *node)
 {
 	int temp;
 
@@ -63,6 +63,7 @@ void bubble_up(heap_t *node)
 		node->parent->n = temp;
 		node = node->parent;
 	}
+	return (node);
 }
 
 /**
@@ -74,7 +75,7 @@ void bubble_up(heap_t *node)
 heap_t *heap_insert(heap_t **root, int value)
 {
 	size_t size;
-	heap_t *parent, *new_node;
+	heap_t *parent;
 
 	if (!root)
 		return (NULL);
@@ -96,16 +97,13 @@ heap_t *heap_insert(heap_t **root, int value)
 		parent->left = binary_tree_node(parent, value);
 		if (!parent->left)
 			return (NULL);
-		new_node = parent->left;
+		return (bubble_up(parent->left));
 	}
 	else
 	{
 		parent->right = binary_tree_node(parent, value);
 		if (!parent->right)
 			return (NULL);
-		new_node = parent->right;
+		return (bubble_up(parent->right));
 	}
-
-	bubble_up(new_node);
-	return (new_node);
 }
