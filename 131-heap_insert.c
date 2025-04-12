@@ -13,15 +13,15 @@ size_t binary_tree_size(const binary_tree_t *tree)
 }
 
 /**
- * get_node_at_index - Gets the node where we should insert next
+ * get_node_at_index - Gets the node at a given index (level-order traversal)
  * @tree: Pointer to the root node
- * @index: Index to find (as if tree is in array)
- * Return: Pointer to node at that position
+ * @index: Index to search for
+ * Return: Pointer to the node or NULL
  */
 heap_t *get_node_at_index(heap_t *tree, size_t index)
 {
-	heap_t *parent;
 	size_t path[64], i = 0, depth = 0;
+	heap_t *current = tree;
 
 	if (!tree)
 		return (NULL);
@@ -32,20 +32,22 @@ heap_t *get_node_at_index(heap_t *tree, size_t index)
 		index /= 2;
 	}
 
-	parent = tree;
-	for (i = depth - 1; i > 0; i--)
+	for (i = depth; i > 1; i--)
 	{
-		if (path[i] == 0)
-			parent = parent->left;
+		if (path[i - 1] == 0)
+			current = current->left;
 		else
-			parent = parent->right;
+			current = current->right;
+		if (!current)
+			return (NULL);
 	}
-	return (parent);
+
+	return (current);
 }
 
 /**
- * bubble_up - Fixes the Max Heap by moving the node up
- * @node: The node to bubble up
+ * bubble_up - Moves a node up to maintain Max Heap property
+ * @node: Pointer to the node to adjust
  */
 void bubble_up(heap_t *node)
 {
@@ -64,7 +66,7 @@ void bubble_up(heap_t *node)
  * heap_insert - Inserts a value in Max Binary Heap
  * @root: Double pointer to the root node
  * @value: Value to insert
- * Return: Pointer to the created node
+ * Return: Pointer to the created node or NULL
  */
 heap_t *heap_insert(heap_t **root, int value)
 {
@@ -83,14 +85,21 @@ heap_t *heap_insert(heap_t **root, int value)
 	size = binary_tree_size(*root);
 	parent = get_node_at_index(*root, (size - 1) / 2);
 
-	if (parent->left == NULL)
+	if (!parent)
+		return (NULL);
+
+	if (!parent->left)
 	{
 		parent->left = binary_tree_node(parent, value);
+		if (!parent->left)
+			return (NULL);
 		new_node = parent->left;
 	}
 	else
 	{
 		parent->right = binary_tree_node(parent, value);
+		if (!parent->right)
+			return (NULL);
 		new_node = parent->right;
 	}
 
