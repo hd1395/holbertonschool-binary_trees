@@ -32,31 +32,22 @@ heap_t *bubble_up(heap_t *node)
 }
 
 /**
- * heap_insert - Inserts a value in Max Binary Heap
- * @root: Double pointer to the root of the heap
+ * heap_insert_levelorder - Helper for heap_insert using level-order traversal
+ * @root: Pointer to the root node
  * @value: Value to insert
  * Return: Pointer to the created node or NULL on failure
  */
-heap_t *heap_insert(heap_t **root, int value)
+heap_t *heap_insert_levelorder(heap_t *root, int value)
 {
 	heap_t *new_node, *current;
 	heap_t **queue;
 	size_t front = 0, rear = 0, size = 1024;
 
-	if (!root)
-		return (NULL);
-
-	if (!*root)
-	{
-		*root = binary_tree_node(NULL, value);
-		return (*root);
-	}
-
 	queue = malloc(sizeof(heap_t *) * size);
 	if (!queue)
 		return (NULL);
 
-	queue[rear++] = *root;
+	queue[rear++] = root;
 
 	while (front < rear)
 	{
@@ -66,39 +57,47 @@ heap_t *heap_insert(heap_t **root, int value)
 		{
 			current->left = binary_tree_node(current, value);
 			if (!current->left)
-			{
-				free(queue);
-				return (NULL);
-			}
+				break;
 			new_node = current->left;
 			free(queue);
 			return (bubble_up(new_node));
 		}
-		else
-		{
-			if (rear < size)
-				queue[rear++] = current->left;
-		}
+		else if (rear < size)
+			queue[rear++] = current->left;
 
 		if (!current->right)
 		{
 			current->right = binary_tree_node(current, value);
 			if (!current->right)
-			{
-				free(queue);
-				return (NULL);
-			}
+				break;
 			new_node = current->right;
 			free(queue);
 			return (bubble_up(new_node));
 		}
-		else
-		{
-			if (rear < size)
-				queue[rear++] = current->right;
-		}
+		else if (rear < size)
+			queue[rear++] = current->right;
 	}
 
 	free(queue);
 	return (NULL);
+}
+
+/**
+ * heap_insert - Inserts a value in Max Binary Heap
+ * @root: Double pointer to the root of the heap
+ * @value: Value to insert
+ * Return: Pointer to the created node or NULL on failure
+ */
+heap_t *heap_insert(heap_t **root, int value)
+{
+	if (!root)
+		return (NULL);
+
+	if (!*root)
+	{
+		*root = binary_tree_node(NULL, value);
+		return (*root);
+	}
+
+	return (heap_insert_levelorder(*root, value));
 }
